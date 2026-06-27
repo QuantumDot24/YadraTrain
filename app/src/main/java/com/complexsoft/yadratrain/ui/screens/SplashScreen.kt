@@ -6,14 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,6 +24,7 @@ import com.complexsoft.yadratrain.ui.theme.YadraStructural
 import com.complexsoft.yadratrain.ui.theme.YadraTextDim
 import com.complexsoft.yadratrain.ui.theme.YadraTextPrimary
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 private val bootLines = listOf(
     "searching for Vulkan layers...",
@@ -41,20 +40,20 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
 
     LaunchedEffect(Unit) {
         for (line in bootLines) {
-            delay(260)
+            delay(260.milliseconds)
             visibleLines.add(line)
         }
-        delay(450)
+        delay(450.milliseconds)
         onSplashFinished()
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(YadraBg),
-        contentAlignment = Alignment.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .background(YadraBg), contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            horizontalAlignment = Alignment.Start
+            modifier = Modifier.padding(horizontal = 32.dp), horizontalAlignment = Alignment.Start
         ) {
             Text(
                 text = "YADRA",
@@ -87,7 +86,11 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
 
             if (visibleLines.size < bootLines.size) {
                 Row {
-                    Text("[ .. ] ", style = MaterialTheme.typography.bodySmall, color = YadraTextDim)
+                    Text(
+                        "[ .. ] ",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = YadraTextDim
+                    )
                     BlinkingCursor(modifier = Modifier.padding(top = 2.dp))
                 }
             }

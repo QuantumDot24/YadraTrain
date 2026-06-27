@@ -1,9 +1,10 @@
 package com.complexsoft.yadratrain.navigation
 
 object NavRoutes {
-    const val SPLASH = "splash"
-    const val SELECT_ENGINE = "select_engine"
-    const val TRAINING = "training/{preset}"  // preset = "MNIST" o "CIFAR10"
-    const val RESULTS = "results/{preset}"     // después de entrenar
-    const val SUMMARY = "summary/{preset}/{correct}/{total}"
+    const val SPLASH         = "splash"
+    const val SELECT_ENGINE  = "select_engine"
+    const val TRAINING       = "training/{preset}"
+    const val RESULTS        = "results/{preset}/{resultsEncoded}"
+    const val RESULTS_AE     = "results_ae/{resultsEncoded}"
+    const val SUMMARY        = "summary/{preset}/{correct}/{total}/{finalAccuracy}"
 }

@@ -1,83 +1,72 @@
 package com.complexsoft.yadratrain.ui.screens
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.complexsoft.yadratrain.data.EnginePreset
 import com.complexsoft.yadratrain.ui.components.SectionLabel
-import com.complexsoft.yadratrain.ui.theme.YadraAccuracy
-import com.complexsoft.yadratrain.ui.theme.YadraBg
-import com.complexsoft.yadratrain.ui.theme.YadraBorder
-import com.complexsoft.yadratrain.ui.theme.YadraError
-import com.complexsoft.yadratrain.ui.theme.YadraStructural
-import com.complexsoft.yadratrain.ui.theme.YadraSurface
-import com.complexsoft.yadratrain.ui.theme.YadraTextDim
-import com.complexsoft.yadratrain.ui.theme.YadraTextPrimary
-import com.yadra.YadraEngine
+import com.complexsoft.yadratrain.ui.theme.*
+import com.complexsoft.yadratrain.ui.viewmodel.TrainingViewModel
+import com.yadra.YadraTrainNative.ClassifierSample
+
+// ── Mapeos por preset ─────────────────────────────────────────────────────
+
+private val MNIST_ICONS = listOf("0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣")
+
+private val FASHION_ICONS  = listOf("👕","👖","🧥","👗","🧣","👡","👔","👟","👜","👢")
+private val FASHION_LABELS = listOf("T-shirt","Trouser","Pullover","Dress","Coat",
+    "Sandal","Shirt","Sneaker","Bag","Ankle boot")
+
+private val CIFAR_ICONS  = listOf("✈️","🚗","🐦","🐱","🦌","🐶","🐸","🐴","🚢","🚚")
+private val CIFAR_LABELS = listOf("Airplane","Automobile","Bird","Cat","Deer",
+    "Dog","Frog","Horse","Ship","Truck")
 
 @Composable
 fun ResultsScreen(
-    preset: String,
-    resultsString: String,
-    correct: Int,
-    total: Int,
-    finalAccuracy: Float,
+    preset: EnginePreset,
+    viewModel: TrainingViewModel,
     onNavigateToSummary: (correct: Int, total: Int, finalAccuracy: Float) -> Unit
 ) {
-    val results = remember(resultsString) {
-        resultsString.split(";").map { part ->
-            val parts = part.split(",")
-            YadraEngine.InferenceResult(parts[0].toInt(), parts[1].toInt())
-        }
-    }
+    val count = 10
+    val samples = remember { viewModel.inferClassifier(0, count) }
+    val correct = remember(samples) { samples.count { it.pred == it.label } }
 
-    val classes = if (preset == "MNIST") {
-        listOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
-    } else {
-        listOf("avion", "auto", "ave", "gato", "venado", "perro", "rana", "caballo", "barco", "camion")
+    val icons  = when (preset) {
+        EnginePreset.MNIST         -> MNIST_ICONS
+        EnginePreset.FASHION_MNIST -> FASHION_ICONS
+        EnginePreset.CIFAR10       -> CIFAR_ICONS
+        else                       -> MNIST_ICONS
+    }
+    val labels = when (preset) {
+        EnginePreset.FASHION_MNIST -> FASHION_LABELS
+        EnginePreset.CIFAR10       -> CIFAR_LABELS
+        else                       -> MNIST_ICONS
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(YadraBg)
-            .padding(24.dp)
+        modifier = Modifier.fillMaxSize().background(YadraBg).padding(24.dp)
     ) {
-        SectionLabel("paso 3 de 3 · inferencia")
+        SectionLabel("step 3 of 3 · inference")
         Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = "Diagnóstico — $preset",
-            style = MaterialTheme.typography.headlineSmall,
-            color = YadraTextPrimary
-        )
-        Text(
-            text = "primeras ${results.size} muestras del test set, predicción vs etiqueta real",
-            style = MaterialTheme.typography.bodySmall,
-            color = YadraTextDim
-        )
+        Text("Results — ${preset.displayName}",
+            style = MaterialTheme.typography.headlineSmall, color = YadraTextPrimary)
+        Text("First $count samples from test set · prediction vs ground truth",
+            style = MaterialTheme.typography.bodySmall, color = YadraTextDim)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -88,12 +77,13 @@ fun ResultsScreen(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
-            itemsIndexed(results) { index, result ->
-                ResultCard(
-                    index = index,
-                    predLabel = classes.getOrElse(result.prediction) { "?" },
-                    realLabel = classes.getOrElse(result.label) { "?" },
-                    isCorrect = result.prediction == result.label
+            itemsIndexed(samples) { index, sample ->
+                ClassifierCard(
+                    index     = index,
+                    sample    = sample,
+                    icons     = icons,
+                    labels    = labels,
+                    numClasses = viewModel.numClasses()
                 )
             }
         }
@@ -101,75 +91,115 @@ fun ResultsScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { onNavigateToSummary(correct, total, finalAccuracy) },
+            onClick = {
+                onNavigateToSummary(correct, count, viewModel.state.value.accuracy)
+            },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = YadraStructural),
             shape = RoundedCornerShape(10.dp)
-        ) {
-            Text("ver resumen", color = YadraBg)
-        }
+        ) { Text("View summary", color = YadraBg) }
     }
 }
 
 @Composable
-private fun ResultCard(
-    index: Int,
-    predLabel: String,
-    realLabel: String,
-    isCorrect: Boolean
+private fun ClassifierCard(
+    index: Int, sample: ClassifierSample,
+    icons: List<String>, labels: List<String>, numClasses: Int
 ) {
-    val accent = if (isCorrect) YadraAccuracy else YadraError
+    val isCorrect = sample.pred == sample.label
+    val accent    = if (isCorrect) YadraAccuracy else YadraError
+    val predIcon  = icons.getOrElse(sample.pred)  { "?" }
+    val predLabel = labels.getOrElse(sample.pred)  { "?" }
+    val realLabel = labels.getOrElse(sample.label) { "?" }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f)
             .background(YadraSurface, RoundedCornerShape(12.dp))
-            .border(1.dp, if (isCorrect) accent.copy(alpha = 0.4f) else accent.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+            .border(1.dp, accent.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
             .padding(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // header: índice de la muestra
-        Text(
-            text = "#%02d".format(index + 1),
+        // Header
+        Text("#%02d".format(index + 1),
             style = MaterialTheme.typography.labelSmall,
             color = YadraTextDim,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Start
-        )
+            modifier = Modifier.fillMaxWidth())
 
-        // cuerpo: clase predicha grande, real chica debajo
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = predLabel,
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                color = YadraTextPrimary,
-                textAlign = TextAlign.Center,
-                maxLines = 1
-            )
-            if (!isCorrect) {
-                Spacer(modifier = Modifier.height(2.dp))
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // Icono grande
+        Text(predIcon, fontSize = 32.sp, textAlign = TextAlign.Center)
+
+        // Etiqueta predicha
+        Text(predLabel,
+            style = MaterialTheme.typography.bodySmall,
+            color = YadraTextPrimary,
+            textAlign = TextAlign.Center,
+            maxLines = 1)
+
+        // Real solo si falló
+        if (!isCorrect) {
+            Text("real: $realLabel",
+                style = MaterialTheme.typography.labelSmall,
+                color = YadraTextDim,
+                textAlign = TextAlign.Center)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Barras de probabilidad — top-3
+        ProbBars(probs = sample.probs, labels = labels, accent = accent)
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // Palomita / tache
+        Text(if (isCorrect) "✓" else "✗", fontSize = 18.sp, color = accent)
+    }
+}
+
+@Composable
+private fun ProbBars(probs: FloatArray, labels: List<String>, accent: Color) {
+    // Top-3 por probabilidad
+    val top3 = probs.indices
+        .sortedByDescending { probs[it] }
+        .take(3)
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        top3.forEach { classIdx ->
+            val prob  = probs[classIdx]
+            val label = labels.getOrElse(classIdx) { classIdx.toString() }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "real: $realLabel",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = label.take(7),
+                    style = MaterialTheme.typography.labelSmall,
                     color = YadraTextDim,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1
+                    modifier = Modifier.width(52.dp)
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(6.dp)
+                        .background(YadraBorder, RoundedCornerShape(3.dp))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(prob)
+                            .background(accent.copy(alpha = 0.8f), RoundedCornerShape(3.dp))
+                    )
+                }
+                Text(
+                    text = "%.0f%%".format(prob * 100f),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = YadraTextDim,
+                    modifier = Modifier.width(32.dp),
+                    textAlign = TextAlign.End
                 )
             }
         }
-
-        // footer: palomita o tache
-        Text(
-            text = if (isCorrect) "✓" else "✗",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = accent
-        )
     }
 }
