@@ -69,11 +69,18 @@ fun TrainingScreen(
     LaunchedEffect(state.isFinished) {
         if (state.isFinished) {
             delay(200.milliseconds)
-            val results = viewModel.inferClassifier(0, 10)
-            val correct = results.count { it.pred == it.label }
-            val total = results.size
-            val resultsString = results.joinToString(";") { "${it.pred},${it.label}" }
-            onTrainingFinished(resultsString, correct, total, state.accuracy)
+
+            if (preset == EnginePreset.CONV_AE) {
+                // Autoencoder — inferencia especial, navegar directo a su pantalla
+                onTrainingFinished("", 0, 0, state.loss)
+            } else {
+                // Clasificadores — inferencia normal
+                val results = viewModel.inferClassifier(0, 10)
+                val correct = results.count { it.pred == it.label }
+                val total = results.size
+                val resultsString = results.joinToString(";") { "${it.pred},${it.label}" }
+                onTrainingFinished(resultsString, correct, total, state.accuracy)
+            }
         }
     }
 
