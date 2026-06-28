@@ -3,33 +3,51 @@ package com.complexsoft.yadratrain.ui.screens
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.complexsoft.yadratrain.ui.components.SectionLabel
-import com.complexsoft.yadratrain.ui.theme.*
+import com.complexsoft.yadratrain.ui.theme.YadraAccuracy
+import com.complexsoft.yadratrain.ui.theme.YadraBg
+import com.complexsoft.yadratrain.ui.theme.YadraBorder
+import com.complexsoft.yadratrain.ui.theme.YadraLoss
+import com.complexsoft.yadratrain.ui.theme.YadraStructural
+import com.complexsoft.yadratrain.ui.theme.YadraSurface
+import com.complexsoft.yadratrain.ui.theme.YadraTextDim
+import com.complexsoft.yadratrain.ui.theme.YadraTextPrimary
 import com.complexsoft.yadratrain.ui.viewmodel.TrainingViewModel
-import com.yadra.YadraTrainNative.AutoencoderResult
 import com.yadra.YadraTrainNative.AutoencoderSample
 
 private const val SAMPLE_COUNT = 8
 
 @Composable
 fun AutoencoderResultsScreen(
-    viewModel: TrainingViewModel,
-    onNavigateToSummary: () -> Unit
+    viewModel: TrainingViewModel, onNavigateToSummary: () -> Unit
 ) {
     val result = remember { viewModel.inferAutoencoder(0, SAMPLE_COUNT) }
 
@@ -42,10 +60,16 @@ fun AutoencoderResultsScreen(
     ) {
         SectionLabel("step 3 of 3 · reconstruction")
         Spacer(modifier = Modifier.height(6.dp))
-        Text("Autoencoder Results",
-            style = MaterialTheme.typography.headlineSmall, color = YadraTextPrimary)
-        Text("Original vs reconstructed · Fashion-MNIST test samples",
-            style = MaterialTheme.typography.bodySmall, color = YadraTextDim)
+        Text(
+            "Autoencoder Results",
+            style = MaterialTheme.typography.headlineSmall,
+            color = YadraTextPrimary
+        )
+        Text(
+            "Original vs reconstructed · Fashion-MNIST test samples",
+            style = MaterialTheme.typography.bodySmall,
+            color = YadraTextDim
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -94,12 +118,22 @@ private fun MseHeader(mseAvg: Float) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text("AVG RECONSTRUCTION MSE",
-                style = MaterialTheme.typography.labelSmall, color = YadraTextDim)
-            Text("%.6f".format(mseAvg),
-                style = MaterialTheme.typography.titleLarge, color = YadraAccuracy)
+            Text(
+                "AVG RECONSTRUCTION MSE",
+                style = MaterialTheme.typography.labelSmall,
+                color = YadraTextDim
+            )
+            Text(
+                "%.6f".format(mseAvg),
+                style = MaterialTheme.typography.titleLarge,
+                color = YadraAccuracy
+            )
         }
-        Text("$SAMPLE_COUNT samples", style = MaterialTheme.typography.bodySmall, color = YadraTextDim)
+        Text(
+            "$SAMPLE_COUNT samples",
+            style = MaterialTheme.typography.bodySmall,
+            color = YadraTextDim
+        )
     }
 }
 
@@ -120,15 +154,15 @@ private fun MnistCanvas(pixels: FloatArray, size: androidx.compose.ui.unit.Dp) {
             .size(size)
             .background(Color.Black, RoundedCornerShape(6.dp))
     ) {
-        val cellW = this.size.width  / 28f
+        val cellW = this.size.width / 28f
         val cellH = this.size.height / 28f
         for (row in 0 until 28) {
             for (col in 0 until 28) {
                 val v = pixels[row * 28 + col].coerceIn(0f, 1f)
                 drawRect(
-                    color  = Color(v, v, v, 1f),
+                    color = Color(v, v, v, 1f),
                     topLeft = Offset(col * cellW, row * cellH),
-                    size   = Size(cellW, cellH)
+                    size = Size(cellW, cellH)
                 )
             }
         }
@@ -148,8 +182,11 @@ private fun MseGrid(samples: List<AutoencoderSample>) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("#%02d".format(i + 1),
-                    style = MaterialTheme.typography.bodySmall, color = YadraTextDim)
+                Text(
+                    "#%02d".format(i + 1),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = YadraTextDim
+                )
                 // Mini barra de MSE relativa al peor del lote
                 val maxMse = samples.maxOf { it.mse }.coerceAtLeast(1e-6f)
                 Box(
@@ -166,8 +203,11 @@ private fun MseGrid(samples: List<AutoencoderSample>) {
                             .background(YadraLoss.copy(alpha = 0.7f), RoundedCornerShape(3.dp))
                     )
                 }
-                Text("%.6f".format(sample.mse),
-                    style = MaterialTheme.typography.bodySmall, color = YadraLoss)
+                Text(
+                    "%.6f".format(sample.mse),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = YadraLoss
+                )
             }
         }
     }

@@ -38,21 +38,15 @@ import com.complexsoft.yadratrain.ui.theme.YadraTextDim
 import com.complexsoft.yadratrain.ui.theme.YadraTextFaint
 import com.complexsoft.yadratrain.ui.theme.YadraTextPrimary
 
-/**
- * Una línea del log con tokens coloreados — el elemento firma de la app.
- * Convierte "Época 2, step 14: loss=2.1093" en algo que se lee como un
- * terminal real, con cada dato en su propio color: época (cian),
- * loss (naranja), accuracy (verde).
- */
 @Composable
 fun TerminalLogLine(entry: LogEntry, modifier: Modifier = Modifier) {
     val text = buildAnnotatedString {
         withStyle(SpanStyle(color = YadraTextFaint)) { append("${entry.timeTag} ") }
-        withStyle(SpanStyle(color = YadraStructural)) { append("época ${entry.epoch}") }
+        withStyle(SpanStyle(color = YadraStructural)) { append("epoch ${entry.epoch}") }
         if (entry.step >= 0) {
             withStyle(SpanStyle(color = YadraTextDim)) { append(" · step ${entry.step}") }
         } else {
-            withStyle(SpanStyle(color = YadraAccuracy)) { append(" · resumen") }
+            withStyle(SpanStyle(color = YadraAccuracy)) { append(" · summary") }
         }
         withStyle(SpanStyle(color = YadraTextFaint)) { append("  ") }
         withStyle(SpanStyle(color = YadraTextDim)) { append("loss=") }
@@ -73,7 +67,6 @@ data class LogEntry(
     val accuracy: Float?
 )
 
-/** Cursor de bloque parpadeante, como un terminal a la espera de input. */
 @Composable
 fun BlinkingCursor(color: Color = YadraStructural, modifier: Modifier = Modifier) {
     val alpha by rememberInfiniteTransition(label = "cursor").animateFloat(
@@ -90,7 +83,6 @@ fun BlinkingCursor(color: Color = YadraStructural, modifier: Modifier = Modifier
     )
 }
 
-/** Etiqueta pequeña tipo "eyebrow" — metadata estructural, no decoración. */
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier) {
     Text(
@@ -101,7 +93,6 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier) {
     )
 }
 
-/** Tarjeta de métrica grande (usada para loss/accuracy en TrainingScreen). */
 @Composable
 fun MetricCard(label: String, value: String, accent: Color, modifier: Modifier = Modifier) {
     Column(
@@ -120,7 +111,6 @@ fun MetricCard(label: String, value: String, accent: Color, modifier: Modifier =
     }
 }
 
-/** Divisor con etiqueta, ej. "── ÚLTIMOS EVENTOS ──". Encierra info real, no decora. */
 @Composable
 fun LabeledDivider(label: String, modifier: Modifier = Modifier) {
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

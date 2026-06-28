@@ -148,22 +148,31 @@ fun TrainingScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             MetricCard(
-                label = "loss",
-                value = "%.4f".format(state.loss),
+                label = if (preset == EnginePreset.CONV_AE) "mse loss" else "loss",
+                value = if (preset == EnginePreset.CONV_AE) "%.6f".format(state.loss) else "%.4f".format(state.loss),
                 accent = YadraLoss,
                 modifier = Modifier.weight(1f)
             )
-            MetricCard(
-                label = "accuracy",
-                value = if (state.accuracy >= 0f) "%.2f%%".format(state.accuracy * 100f) else "—",
-                accent = YadraAccuracy,
-                modifier = Modifier.weight(1f)
-            )
+            if (preset == EnginePreset.CONV_AE) {
+                MetricCard(
+                    label = "epoch",
+                    value = "${state.epoch} / $totalEpochs",
+                    accent = YadraStructural,
+                    modifier = Modifier.weight(1f)
+                )
+            } else {
+                MetricCard(
+                    label = "accuracy",
+                    value = if (state.accuracy >= 0f) "%.2f%%".format(state.accuracy * 100f) else "—",
+                    accent = YadraAccuracy,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
-
         Spacer(modifier = Modifier.height(20.dp))
         LabeledDivider("latest events")
         Spacer(modifier = Modifier.height(8.dp))

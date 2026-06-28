@@ -116,21 +116,20 @@ class TrainingViewModel(application: Application) : AndroidViewModel(application
     }
 
     private fun pushMetric(m: YadraTrainNative.TrainMetric) {
-        Log.d("YadraMetric", "epoch=${m.epoch} step=${m.step} loss=${m.loss} acc=${m.accuracy}")
         val isEpochSummary = m.step == -1
         _state.update { cur ->
             cur.copy(
                 epoch    = m.epoch,
                 step     = m.step,
                 loss     = m.loss,
-                accuracy = if (isEpochSummary) m.accuracy else cur.accuracy,
+                accuracy = if (isEpochSummary && m.accuracy >= 0f) m.accuracy else cur.accuracy,
                 progress = if (totalEpochs > 0) m.epoch.toFloat() / totalEpochs else 0f,
                 logs     = cur.logs + LogEntry(
                     timeTag  = timeFmt.format(Date()),
                     epoch    = m.epoch,
                     step     = m.step,
                     loss     = m.loss,
-                    accuracy = if (isEpochSummary) m.accuracy else null
+                    accuracy = if (isEpochSummary && m.accuracy >= 0f) m.accuracy else null
                 )
             )
         }
