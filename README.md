@@ -1,18 +1,17 @@
 # YadraTrain – Vulkan Deep Learning Training Engine
 
-"Train neural networks entirely on the GPU—even on Android."
+> **Train neural networks entirely on the GPU—even on Android.**
 
 [![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://isocpp.org/)
 [![Vulkan](https://img.shields.io/badge/Vulkan-1.3-red.svg)](https://www.vulkan.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20Android-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg)]()
 
-A **high-performance Vulkan-native deep learning framework** written entirely in modern **C++17**.
+A **high-performance, Vulkan-native deep learning framework** written entirely in modern **C++17**.
 
-**Yadra Core** is a training and inference engine built completely from scratch on top of **Vulkan**, using **Vulkan-Hpp** and **Vulkan Memory Allocator (VMA)**. It is capable of training neural networks **entirely on the GPU**, exporting models to its own portable **`.yet` (Yadra Executable Tensor)** format, and running the exact same codebase on **Windows, Linux, and Android**.
+**YadraTrain** is a GPU-first training and inference engine built entirely from scratch on top of **Vulkan**, using **Vulkan-Hpp** and **Vulkan Memory Allocator (VMA)**. It trains neural networks directly on the GPU, exports models to the portable **`.yet` (Yadra Executable Tensor)** format, and runs the same codebase across **Windows, Linux, and Android**.
 
-Unlike frameworks that rely on CUDA or external compute libraries, Yadra Core is designed around **portable Vulkan compute shaders**, allowing deep learning workloads to execute even on integrated mobile GPUs.
-
+Unlike traditional frameworks that depend on CUDA or vendor-specific compute libraries, YadraTrain is built around portable Vulkan compute shaders, enabling deep learning workloads to run efficiently on desktop GPUs, integrated GPUs, and even modern mobile GPUs.
 ---
 
 # ✨ Features
@@ -414,56 +413,12 @@ Designed for fast loading and deployment.
 
 ---
 
-# Unified Graphviz Architecture
+# Architecture
 
-```dot
-digraph YadraCore {
+<p align="center">
+    <img src="architecture.svg" alt="YadraTrain Architecture" width="900"/>
+</p>
 
-    rankdir=TB;
-
-    node [shape=box, style=filled, fontname="Arial"];
-
-    subgraph cluster_loaders {
-
-        label="Dataset Loaders";
-
-        style=dashed;
-
-        MnistLoader [label="MnistLoader\nIDX Parsing"];
-
-        Fashion [label="Fashion-MNIST"];
-
-        Cifar [label="Cifar10Loader\nGPU Augmentation"];
-
-    }
-
-    TrainGraph [label="TrainGraph"];
-
-    TensorGrads [label="TensorGrads"];
-
-    Adam [label="Adam Optimizer"];
-
-    Vulkan [label="Vulkan Executor\nGraph Capture"];
-
-    Export [label=".yet Export"];
-
-    MnistLoader -> TrainGraph;
-
-    Fashion -> TrainGraph;
-
-    Cifar -> TrainGraph;
-
-    TrainGraph -> TensorGrads;
-
-    TrainGraph -> Adam;
-
-    TensorGrads -> Vulkan;
-
-    Adam -> Vulkan;
-
-    Vulkan -> Export;
-}
-```
 
 ---
 
