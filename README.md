@@ -419,6 +419,7 @@ Designed for fast loading and deployment.
     <img src="architecture.svg" alt="YadraTrain Architecture" width="900"/>
 </p>
 
+The training pipeline is built around a reusable Vulkan execution graph. Dataset loaders feed mini-batches into `TrainGraph`, where forward propagation, backpropagation, and optimization are captured into a Vulkan command buffer. Once recorded, the graph is replayed for every training batch using `reexecute_graph()`, minimizing CPU overhead and maximizing GPU utilization across desktop and mobile devices.
 
 ---
 
