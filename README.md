@@ -409,12 +409,6 @@ Designed for fast loading and deployment.
 
 - [ ] ImageNet support
 - [ ] Transformer training
-- [ ] Mixed Precision (FP16)
-- [ ] SGD + Momentum
-- [ ] RMSProp
-- [ ] ONNX export
-- [ ] Quantization
-- [ ] Structured pruning
 - [ ] Multi-GPU support
 - [ ] Distributed training
 
