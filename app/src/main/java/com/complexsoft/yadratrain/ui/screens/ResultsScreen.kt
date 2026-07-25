@@ -24,7 +24,7 @@ import com.complexsoft.yadratrain.ui.theme.*
 import com.complexsoft.yadratrain.ui.viewmodel.TrainingViewModel
 import com.yadra.YadraTrainNative.ClassifierSample
 
-// ── Mapeos por preset ─────────────────────────────────────────────────────
+// ── Preset Mappings ───────────────────────────────────────────────────────
 
 private val MNIST_ICONS = listOf("0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣")
 
@@ -131,14 +131,14 @@ private fun ClassifierCard(
         // Icono grande
         Text(predIcon, fontSize = 32.sp, textAlign = TextAlign.Center)
 
-        // Etiqueta predicha
+        // Prediction label
         Text(predLabel,
             style = MaterialTheme.typography.bodySmall,
             color = YadraTextPrimary,
             textAlign = TextAlign.Center,
             maxLines = 1)
 
-        // Real solo si falló
+        // Ground truth only if it failed
         if (!isCorrect) {
             Text("real: $realLabel",
                 style = MaterialTheme.typography.labelSmall,
@@ -148,19 +148,19 @@ private fun ClassifierCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Barras de probabilidad — top-3
+        // Probability bars — top-3
         ProbBars(probs = sample.probs, labels = labels, accent = accent)
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        // Palomita / tache
+        // Checkmark / X
         Text(if (isCorrect) "✓" else "✗", fontSize = 18.sp, color = accent)
     }
 }
 
 @Composable
 private fun ProbBars(probs: FloatArray, labels: List<String>, accent: Color) {
-    // Top-3 por probabilidad
+    // Top-3 by probability
     val top3 = probs.indices
         .sortedByDescending { probs[it] }
         .take(3)

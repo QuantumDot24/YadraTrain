@@ -65,7 +65,7 @@ fun SummaryScreen(
                 accent = YadraStructural
             )
         } else {
-            // Autoencoder — sin accuracy, solo confirmación
+            // Autoencoder — no accuracy, confirmation only
             StatCard(label = "SAMPLES RECONSTRUCTED", value = "$total", accent = YadraAccuracy)
             Spacer(modifier = Modifier.height(12.dp))
             StatCard(label = "FINAL AVG LOSS (MSE)", value = "%.6f".format(finalAccuracy), accent = YadraLoss)

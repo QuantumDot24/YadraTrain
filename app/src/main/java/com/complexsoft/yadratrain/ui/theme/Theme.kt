@@ -26,8 +26,8 @@ private val YadraDarkScheme = darkColorScheme(
 
 @Composable
 fun YadraTrainTheme(
-    // El tema es siempre oscuro a propósito — es la identidad de la app,
-    // no una preferencia del sistema. Se ignora isSystemInDarkTheme().
+    // The theme is intentionally dark — it's the app's identity, 
+    // not a system preference. isSystemInDarkTheme() is ignored.
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

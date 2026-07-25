@@ -8,7 +8,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.complexsoft.yadratrain.R
 
-// Requiere los .ttf en res/font/. Si no los tienes aún, ver nota al final.
+// Requires .ttf files in res/font/. If you don't have them yet, see note at the end.
 //val FontFamily.Monospace = FontFamily(
 //    Font(R.font.etbrains_mono_regular, FontWeight.Normal),
 //    Font(R.font.jetbrains_mono_medium, FontWeight.Medium),
@@ -65,12 +65,12 @@ val YadraTypography = Typography(
 )
 
 /*
- NOTA: descarga JetBrains Mono (gratis, OFL) de https://www.jetbrains.com/lp/mono/
- y coloca estos 3 archivos en app/src/main/res/font/:
+ NOTE: Download JetBrains Mono (free, OFL) from https://www.jetbrains.com/lp/mono/
+ and place these 3 files in app/src/main/res/font/:
    jetbrains_mono_regular.ttf
    jetbrains_mono_medium.ttf
    jetbrains_mono_bold.ttf
- Si por ahora no quieres bajar las fuentes, reemplaza `FontFamily.Monospace` por
- `FontFamily.Monospace` (la mono del sistema) y todo compila igual,
- solo se ve un poco menos distintivo.
+ If you don't want to download the fonts yet, replace `FontFamily.Monospace` with
+ `FontFamily.Monospace` (system mono) and everything will compile,
+ it will just look slightly less distinctive.
 */

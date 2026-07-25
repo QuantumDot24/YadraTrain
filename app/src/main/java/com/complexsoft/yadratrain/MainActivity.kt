@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 private fun YadraNavGraph(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
-    // ViewModel único compartido por toda la sesión de entrenamiento
+    // Single ViewModel shared across the entire training session
     val trainingViewModel: TrainingViewModel = viewModel()
 
     NavHost(

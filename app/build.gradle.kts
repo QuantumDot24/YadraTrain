@@ -38,18 +38,18 @@ android {
 dependencies {
     implementation(files("libs/yadra-train-release.aar"))
 
-    // Corutinas
+    // Coroutines
     implementation(libs.kotlinx.coroutines.android)
 
     // Compose BOM
     implementation(platform(libs.androidx.compose.bom))
 
-    // Compose UI (ya tienes)
+    // Compose UI (already included)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    // NUEVO: iconos extendidos (para CIFAR-10)
+    // NEW: extended icons (for CIFAR-10)
     implementation(libs.androidx.compose.material.icons.extended)
 
     // Activity Compose
@@ -57,21 +57,21 @@ dependencies {
 
     // Lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    // NUEVO: ViewModel en Compose
+    // NEW: ViewModel in Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    // NUEVO: Runtime Compose (para collectAsStateWithLifecycle)
+    // NEW: Runtime Compose (for collectAsStateWithLifecycle)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Core KTX
     implementation(libs.androidx.core.ktx)
 
-    // NUEVO: Navegación Compose
+    // NEW: Navigation Compose
     implementation(libs.androidx.navigation.compose)
 
-    // NUEVO: DocumentFile (para guardar archivos)
+    // NEW: DocumentFile (to save files)
     implementation(libs.androidx.documentfile)
 
-    // Test... (lo que ya tienes)
+    // Test... (what you already have)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

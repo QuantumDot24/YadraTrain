@@ -60,20 +60,20 @@ class TrainingViewModel(application: Application) : AndroidViewModel(application
 
         trainingJob = viewModelScope.launch {
             try {
-                // 1. Inicializar
+                // 1. Initialize
                 withContext(Dispatchers.IO) {
                     handle = YadraTrainNative.nativeInit(preset.ordinal_, assets)
                     Log.d("Yadra", "handle after init = $handle, preset=${preset.name}, ordinal=${preset.ordinal_}")
                 }
                 if (handle == 0L) {
-                    _state.update { it.copy(isLoadingDataset = false, error = "nativeInit devolvió 0") }
+                    _state.update { it.copy(isLoadingDataset = false, error = "nativeInit returned 0") }
                     return@launch
                 }
 
                 numClasses = YadraTrainNative.nativeNumClasses(handle)
                 _state.update { it.copy(isLoadingDataset = false, isTraining = true) }
 
-                // 2. Lanzar el poller justo antes del entrenamiento
+                // 2. Launch the poller right before training
                 val pollerJob = launch {
                     var pollCount = 0
                     while (isActive) {
@@ -81,21 +81,21 @@ class TrainingViewModel(application: Application) : AndroidViewModel(application
                         if (raw != null) {
                             pushMetric(YadraTrainNative.unpackMetric(raw))
                         } else {
-                            // Solo para debug: imprime cada 100 iteraciones (~1.6 s)
+                            // Debug only: print every 100 iterations (~1.6 s)
                             pollCount++
                             if (pollCount % 100 == 0) {
-                                Log.d("YadraDebug", "Poller iteración $pollCount, raw sigue null")
+                                Log.d("YadraDebug", "Poller iteration $pollCount, raw still null")
                             }
                         }
                         delay(16)
                     }
                 }
-                // 3. Entrenar (bloquea hasta terminar)
+                // 3. Train (blocks until completion)
                 withContext(Dispatchers.IO) {
                     YadraTrainNative.nativeStartTraining(handle, epochs)
                 }
 
-                // 4. Drenar métricas residuales y detener poller
+                // 4. Drain residual metrics and stop poller
                 drainMetrics(epochs)
                 pollerJob.cancel()
 

@@ -76,7 +76,7 @@ fun AutoencoderResultsScreen(
         if (result == null) {
             Text("No results available.", color = YadraTextDim)
         } else {
-            // MSE promedio
+            // Average MSE
             MseHeader(mseAvg = result.mseAvg)
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -187,7 +187,7 @@ private fun MseGrid(samples: List<AutoencoderSample>) {
                     style = MaterialTheme.typography.bodySmall,
                     color = YadraTextDim
                 )
-                // Mini barra de MSE relativa al peor del lote
+                // Mini MSE bar relative to the worst in the batch
                 val maxMse = samples.maxOf { it.mse }.coerceAtLeast(1e-6f)
                 Box(
                     modifier = Modifier
